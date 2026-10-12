@@ -67,7 +67,7 @@ GenerateClassCluster=0
 DocumentUniqueId=MUHMECAE
 
 [Document2]
-DocumentPath=smart_safety-PCB.PcbDoc
+DocumentPath=smart_safety-pcb.PcbDoc
 AnnotationEnabled=1
 AnnotateStartValue=1
 AnnotationIndexControlEnabled=0
@@ -81,7 +81,7 @@ ClassGenCCAutoRoomEnabled=0
 ClassGenNCAutoScope=None
 DItemRevisionGUID=
 GenerateClassCluster=0
-DocumentUniqueId=OTJNDOMW
+DocumentUniqueId=ICHNIYGL
 
 [Configuration1]
 Name=Sources
