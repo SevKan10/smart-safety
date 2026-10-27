@@ -1,0 +1,5 @@
+1. Đọc điện áp của pin và ắc quy:
+	+ sử dụng cầu chia áp 
+	+ sử dụng ic
+2. Diode chặn dòng khi tắt nguồn không cho trào ngược lại Relay
+3. 
