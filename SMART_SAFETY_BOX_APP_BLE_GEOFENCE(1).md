@@ -73,7 +73,18 @@ Nghiên cứu và phát triển một hệ thống tích hợp trên xe máy có
 6. Xác định vị trí xe bằng GPS.
 7. Cảnh báo và hỗ trợ liên lạc khẩn cấp.
 8. Ghi lại dữ liệu trước và sau sự kiện để phục vụ nghiên cứu.
-9. Xây dựng nền tảng có thể mở rộng thành Web/App trong tương lai.
+9. Xây dựng nền tảng có thể mở rộng thành các nền tảng khác trong tương lai, nhưng phiên bản đầu tiên tập trung vào Android app.
+
+## 3.2. Phạm vi triển khai hiện tại
+
+Trong giai đoạn hiện tại, đề tài **chỉ tập trung phát triển ứng dụng Android** để giao tiếp với Smart Safety Box qua BLE và cung cấp giao diện quản lý cho người dùng.
+
+- **Sản phẩm ưu tiên:** Android app.
+- **Thiết bị mục tiêu:** điện thoại Android có hỗ trợ Bluetooth Low Energy và GPS.
+- **Web dashboard:** chưa triển khai trong giai đoạn đầu; chỉ là hướng phát triển tương lai.
+- **iOS:** chưa thuộc phạm vi MVP và chỉ cân nhắc sau khi Android app cùng giao thức BLE đã ổn định.
+
+Do người phát triển chưa có nhiều kinh nghiệm viết ứng dụng, quá trình triển khai có thể sử dụng **vibe coding**: dùng AI để hỗ trợ tạo mã, giải thích lỗi, chia nhỏ tính năng và viết kiểm thử. AI là công cụ hỗ trợ; mỗi thay đổi vẫn cần được kiểm tra trên Android emulator hoặc điện thoại Android thật.
 
 ---
 
@@ -730,9 +741,11 @@ Sau này có thể chuyển hoặc mở rộng sang:
 
 ---
 
-# 22. Web Dashboard
+# 22. Web Dashboard — định hướng tương lai
 
-Ngoài Mobile App, hệ thống có thể phát triển Web Dashboard:
+Web dashboard **không thuộc phạm vi phát triển hiện tại**. Nội dung dưới đây chỉ mô tả khả năng mở rộng sau khi Android app, firmware và backend đã ổn định.
+
+Trong tương lai, hệ thống có thể phát triển thêm Web Dashboard:
 
 ```text
 Web Dashboard
@@ -1095,11 +1108,26 @@ Lưu dữ liệu trước và sau sự kiện để nghiên cứu và đánh gi�
 
 ## Mobile
 
-Có thể lựa chọn:
+### Lựa chọn cho phiên bản đầu tiên
 
-- Android Native / Kotlin
-- Flutter
-- React Native
+Phiên bản đầu tiên ưu tiên **Android app**. Có thể chọn một trong hai hướng sau:
+
+- **Flutter:** lựa chọn khuyến nghị cho vibe coding vì cấu trúc giao diện tương đối thống nhất và dễ mở rộng sang iOS trong tương lai nếu cần.
+- **Android Native / Kotlin:** lựa chọn phù hợp nếu muốn tối ưu sâu cho Android và BLE.
+
+React Native chưa cần đưa vào MVP để tránh tăng số lượng công nghệ phải học và phải xử lý.
+
+### Nguyên tắc vibe coding
+
+Để giảm rủi ro khi phát triển bằng AI, mỗi lần yêu cầu AI chỉ nên tập trung vào một tính năng nhỏ:
+
+1. Mô tả rõ mục tiêu, màn hình, dữ liệu đầu vào và kết quả mong muốn.
+2. Yêu cầu AI giải thích các file sẽ thay đổi trước khi viết mã.
+3. Chạy thử ngay trên Android emulator hoặc điện thoại thật sau mỗi thay đổi.
+4. Lưu lỗi, log BLE và ảnh chụp màn hình khi kiểm thử để AI có đủ ngữ cảnh sửa lỗi.
+5. Không yêu cầu AI viết toàn bộ ứng dụng trong một lần; ưu tiên hoàn thành từng màn hình và từng luồng.
+
+Thứ tự triển khai app Android nên là: màn hình kết nối BLE → đọc trạng thái thiết bị → đăng nhập/tài khoản → Digital Key → mở khóa có xác thực → quản lý người dùng → cảnh báo và lịch sử sự kiện.
 
 ## Backend
 
@@ -1135,7 +1163,7 @@ Giai đoạn mở rộng:
 - State Machine
 - Data logging
 
-## Phase 3 — Mobile App
+## Phase 3 — Android App (MVP)
 
 - Login
 - Vehicle
@@ -1143,6 +1171,8 @@ Giai đoạn mở rộng:
 - Digital Key
 - Unlock
 - User management
+- Kiểm thử trên Android emulator và điện thoại Android thật
+- Hoàn thiện các luồng chính bằng vibe coding có kiểm thử
 
 ## Phase 4 — Security
 
@@ -1186,7 +1216,7 @@ Giai đoạn mở rộng:
 
 Có thể mở rộng:
 
-- Android / iOS
+- iOS sau khi Android app ổn định
 - Smartwatch
 - NFC backup key
 - UWB proximity
@@ -1194,13 +1224,234 @@ Có thể mở rộng:
 - Anti-theft alarm
 - Remote vehicle status
 - OTA firmware
-- Web dashboard
+- Web dashboard sau giai đoạn Android app và backend ổn định
 - Cloud analytics
 - Machine Learning cho accident detection
 - AI phân loại tình huống
 - Fleet management
 
 ---
+
+
+
+# 33A. Hàng rào ảo (Geofencing)
+
+Hệ thống có thể bổ sung **hàng rào ảo (Geofence)** để giám sát khu vực hoạt động của xe và tăng cường khả năng chống trộm. Chức năng này không chỉ đơn thuần cảnh báo khi xe ra khỏi vùng mà còn có thể kết hợp với trạng thái khóa xe, GPS và Digital Key để đánh giá hành vi đáng ngờ.
+
+## 33A.1. Khái niệm
+
+OWNER có thể tạo một khu vực an toàn trên Mobile App bằng cách chọn vị trí trung tâm và bán kính. Ví dụ:
+
+```text
+             HÀNG RÀO ẢO
+        ┌───────────────────┐
+        │                   │
+        │      🏠 Nhà       │
+        │                   │
+        │        🏍️         │
+        │                   │
+        └───────────────────┘
+              300 mét
+```
+
+Các thông tin cấu hình có thể gồm:
+
+- Tên Geofence
+- Latitude / Longitude của tâm
+- Bán kính
+- Trạng thái Enable / Disable
+- Chế độ cảnh báo
+- Người nhận cảnh báo
+- Điều kiện kích hoạt
+
+## 33A.2. Các chế độ Geofence
+
+### Normal Geofence
+
+Xe được phép rời khỏi vùng nhưng hệ thống gửi thông báo cho người dùng:
+
+```text
+⚠️ Xe đã rời khỏi khu vực an toàn.
+```
+
+Phù hợp để theo dõi xe hoặc người thân.
+
+### Anti-theft Geofence
+
+Khi xe đang ở trạng thái `LOCKED` mà GPS phát hiện xe rời khỏi khu vực an toàn, hệ thống chuyển sang trạng thái nghi ngờ trộm:
+
+```text
+LOCKED
+   ↓
+GPS Position
+   ↓
+Outside Geofence?
+   ↓
+YES
+   ↓
+🚨 POSSIBLE THEFT
+   ↓
+Buzzer / Alert
+   ↓
+Mobile App
+```
+
+### Family / Restricted Zone
+
+OWNER có thể thiết lập khu vực được phép cho người thân. Khi xe ra khỏi khu vực, ADMIN hoặc các liên hệ được cấp quyền có thể nhận cảnh báo.
+
+## 33A.3. Không quyết định chỉ bằng một mẫu GPS
+
+GPS có sai số và vị trí có thể dao động quanh biên Geofence. Vì vậy không nên thực hiện:
+
+```text
+GPS > Radius → Alert
+```
+
+chỉ dựa trên một mẫu dữ liệu. Hệ thống nên xác nhận trạng thái bằng nhiều mẫu GPS liên tiếp và có vùng đệm.
+
+Ví dụ sử dụng hysteresis:
+
+```text
+Geofence radius = 500 m
+
+< 500 m       → INSIDE
+500–530 m     → BOUNDARY
+> 530 m       → OUTSIDE
+```
+
+Cách này giúp giảm cảnh báo giả do sai số GPS.
+
+## 33A.4. State Machine của Geofence
+
+```text
+INSIDE
+   │
+   │ GPS samples
+   ▼
+BOUNDARY
+   │
+   │ Xác nhận nhiều mẫu
+   ▼
+OUTSIDE
+   │
+   ├── Alert
+   ├── Event Log
+   └── Tracking
+```
+
+Khi xe quay lại vùng an toàn, hệ thống có thể ghi nhận sự kiện `GEOFENCE_ENTERED` và gửi thông báo nếu người dùng bật tùy chọn này.
+
+## 33A.5. Kết hợp Geofence với Security Engine
+
+Geofence nên được tích hợp với các thành phần bảo mật hiện có thay vì hoạt động độc lập:
+
+```text
+                    SMART SAFETY BOX
+                           │
+          ┌────────────────┼────────────────┐
+          ▼                ▼                ▼
+       GPS Zone        Vehicle State     Digital Key
+          │                │                │
+          ▼                ▼                ▼
+       INSIDE/OUTSIDE    LOCKED/RIDING    Authorized?
+          │                │                │
+          └────────────────┼────────────────┘
+                           ▼
+                    SECURITY ENGINE
+                           │
+             ┌─────────────┴─────────────┐
+             ▼                           ▼
+        NORMAL EVENT                SUSPICIOUS
+                                         │
+                                         ▼
+                                  🚨 ALERT OWNER
+```
+
+Ví dụ: xe đang khóa tại nhà, không có Digital Key hợp lệ nhưng vị trí bắt đầu di chuyển ra khỏi Geofence. Hệ thống có thể tạo sự kiện nghi ngờ trộm và gửi cảnh báo cho OWNER.
+
+```text
+🚨 CẢNH BÁO CHỐNG TRỘM
+
+Xe đang rời khỏi khu vực an toàn.
+Trạng thái: Locked
+Digital Key: Không xác thực
+Vị trí: GPS hiện tại
+```
+
+## 33A.6. Dữ liệu Geofence
+
+Có thể lưu trong Backend:
+
+```text
+geofenceId
+vehicleId
+name
+centerLatitude
+centerLongitude
+radius
+boundaryBuffer
+mode
+enabled
+alertOnExit
+alertOnEnter
+createdBy
+createdAt
+```
+
+Event History có thể ghi:
+
+```text
+GEOFENCE_ENTERED
+GEOFENCE_EXITED
+GEOFENCE_BOUNDARY
+POSSIBLE_THEFT
+```
+
+## 33A.7. Giao diện Mobile App
+
+Dashboard có thể bổ sung mục:
+
+```text
+🗺️ Geofence
+
+Home Zone
+● Active
+
+Radius: 500 m
+Mode: Anti-theft
+
+[ Edit ]   [ Disable ]
+
+-------------------------
+
+[ + Add Geofence ]
+```
+
+Màn hình cấu hình cho phép OWNER:
+
+- Chọn vị trí trên bản đồ
+- Thiết lập bán kính
+- Đặt tên khu vực
+- Chọn chế độ
+- Bật/tắt cảnh báo khi ra khỏi vùng
+- Bật/tắt cảnh báo khi quay lại vùng
+- Chọn người nhận cảnh báo
+
+## 33A.8. Vai trò của Geofence trong đề tài
+
+Geofencing mở rộng hệ thống từ một thiết bị xác thực và an toàn thành một nền tảng có khả năng **giám sát không gian hoạt động của xe**. Khi kết hợp:
+
+- GPS
+- Vehicle State
+- Digital Key
+- Permission
+- Geofence
+- Event Logging
+
+hệ thống có thể đánh giá tình huống theo nhiều yếu tố thay vì chỉ dựa vào một cảm biến hoặc một điều kiện đơn lẻ.
+
+Đây cũng là một thành phần phù hợp để phát triển thành **Security Engine** của Smart Safety Box.
 
 # 34. Định hướng nghiên cứu
 
