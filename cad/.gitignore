@@ -1,0 +1,53 @@
+# ==========================================
+# SolidWorks Temporary & Lock Files
+# ==========================================
+# File khóa hệ thống và file tạm khi đang mở thiết kế
+~$*.SLDPRT
+~$*.SLDASM
+~$*.SLDDRW
+~$*.sldprt
+~$*.sldasm
+~$*.slddrw
+*.TMP
+*.tmp
+
+# ==========================================
+# SolidWorks Backup & Auto-recovery Files
+# ==========================================
+# File tự động sao lưu của SolidWorks
+*.bak
+*.swp
+*.sw$
+
+# ==========================================
+# SolidWorks Working Directory & Cache Data
+# ==========================================
+# Dữ liệu cache mô phỏng và hiệu năng (SolidWorks Performance / Simulation)
+*.swp.html
+*.swp.xml
+*.swp.png
+*.err
+
+# Thư mục lưu kết quả mô phỏng (SolidWorks Simulation / Motion / Flow Analysis)
+**/SimulationResults/
+**/SolidWorks Performance Data/
+*.sim
+*.cwr
+*.msh
+
+# ==========================================
+# Operating System & IDE Files
+# ==========================================
+# File ẩn của Windows / macOS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# File thiết lập môi trường lập trình (nếu có viết Macro / Add-in VBA, C#, C++)
+.vs/
+*.user
+*.suo
+bin/
+obj/
