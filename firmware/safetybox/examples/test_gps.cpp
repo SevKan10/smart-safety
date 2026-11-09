@@ -1,52 +1,62 @@
-//http://maps.google.com/maps?q=loc:
-#include <TinyGPS++.h>  // Include TinyGPS++ library
-#include <HardwareSerial.h> // Dùng HardwareSerial trên ESP32
+#include <TinyGPS++.h> 
+// Trên ESP32-S3, Arduino Core đã tích hợp sẵn Serial1 và Serial2 nên không cần tự khai báo biến HardwareSerial mới.
 
 TinyGPSPlus gps;
 
-// Khai báo chân UART2 cho GPS: RX = 5, TX = 4
+// Chân GPIO 4 và 5 trên ESP32-S3 hoàn toàn an toàn để dùng làm UART
+// Nối: TX của GPS -> RX_PIN (4) của ESP32-S3
+//      RX của GPS -> TX_PIN (5) của ESP32-S3
 #define RX_PIN 4
 #define TX_PIN 5
-HardwareSerial gpsSerial(2); // Sử dụng UART số 2
+
+unsigned long lastGpsStatus = 0;
 
 void setup(void) {
   Serial.begin(115200); // Tốc độ Serial Monitor
-  gpsSerial.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN); // Khởi tạo UART2 baudrate 9600
   
-  Serial.println("Đang khởi động GPS trên ESP32 UART2 (RX: 5, TX: 4)...");
+  // Khởi tạo UART2 có sẵn với cấu hình baudrate 9600 cho ESP32-S3
+  Serial2.begin(9600, SERIAL_8N1, RX_PIN, TX_PIN); 
+  Serial.println("Đang khởi động GPS trên ESP32-S3 UART2 (RX: 5, TX: 4)...");
 }
 
 void loop() {
-  while (gpsSerial.available() > 0) {
-    if (gps.encode(gpsSerial.read())) {
+  while (Serial2.available() > 0) {
+    if (gps.encode(Serial2.read())) {
+      
       if (gps.location.isValid()) {
+        float lat = gps.location.lat();
+        float lng = gps.location.lng();
+        
         Serial.print("Latitude   = ");
-        Serial.println(gps.location.lat(), 6);
+        Serial.println(lat, 6);
         Serial.print("Longitude  = ");
-        Serial.println(gps.location.lng(), 6);
+        Serial.println(lng, 6);
+        
+        // In ra link Google Maps trực tiếp
+        Serial.print("Google Maps: http://maps.google.com/maps?q=loc:");
+        Serial.print(lat, 6);
+        Serial.print(",");
+        Serial.println(lng, 6);
       }
-      else
-        Serial.println("Location Invalid");
+      else {
+        Serial.println("Location Invalid (Đang tìm vệ tinh...)");
+      }
         
       if (gps.altitude.isValid()) {
         Serial.print("Altitude   = ");
         Serial.print(gps.altitude.meters());
         Serial.println(" meters");
       }
-      else
-        Serial.println("Altitude Invalid");
         
       if (gps.speed.isValid()) {
         Serial.print("Speed      = ");
         Serial.print(gps.speed.kmph());
         Serial.println(" kmph");
       }
-      else
-        Serial.println("Speed Invalid");
         
       if (gps.time.isValid()) {
-        Serial.print("Time (GMT) : ");
-        int hour = gps.time.hour() + 7; // Chuyển sang giờ Việt Nam (GMT+7)
+        Serial.print("Time (VN)  : ");
+        int hour = gps.time.hour() + 7; // Giờ Việt Nam
         if (hour >= 24) hour -= 24;
         
         if (hour < 10) Serial.print("0");
@@ -58,8 +68,6 @@ void loop() {
         if (gps.time.second() < 10) Serial.print("0");
         Serial.println(gps.time.second());
       }
-      else
-        Serial.println("Time Invalid");
         
       if (gps.date.isValid()) {
         Serial.print("Date       : ");
@@ -71,17 +79,28 @@ void loop() {
         Serial.print("/");
         Serial.println(gps.date.year());
       }
-      else
-        Serial.println("Date Invalid");
         
       if (gps.satellites.isValid()) {
         Serial.print("Satellites = ");
         Serial.println(gps.satellites.value());
       }
-      else
-        Serial.println("Satellites Invalid");
         
       Serial.println("-----------------------------------");
+    }
+  }
+
+  // Cảnh báo nếu module GPS chưa kết nối đúng dây hoặc module chưa gửi dữ liệu
+  if (millis() - lastGpsStatus >= 2000) {
+    lastGpsStatus = millis();
+    Serial.print("Đang chờ GPS | bytes: ");
+    Serial.print(gps.charsProcessed());
+    Serial.print(" | câu có fix: ");
+    Serial.print(gps.sentencesWithFix());
+    Serial.print(" | checksum lỗi: ");
+    Serial.println(gps.failedChecksum());
+    
+    if (gps.charsProcessed() < 10) {
+      Serial.println("CẢNH BÁO: Không nhận được dữ liệu GPS. Hãy kiểm tra lại dây nối TX/RX.");
     }
   }
 }
